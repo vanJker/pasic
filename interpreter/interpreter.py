@@ -34,7 +34,16 @@ class Interpreter:
         
         current_char = text[self.pos]
         if current_char.isdigit():
-            token = Token(INTEGER, int(current_char))
+            digit_str = ''
+            while current_char.isdigit():
+                digit_str += current_char
+                self.pos += 1
+                try:
+                    current_char = text[self.pos]
+                except:
+                    break            
+            self.pos -= 1
+            token = Token(INTEGER, int(digit_str))
         elif current_char == '+':
             token = Token(PLUS, current_char)
         elif current_char == '-':
