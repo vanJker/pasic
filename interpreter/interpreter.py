@@ -1,7 +1,7 @@
 # Interpreter
 
 # Identify
-INTEGER, PLUS, EOF = 'INTEGER', 'PLUS', 'EOF'
+INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 class Token:
     def __init__(self, value_type, value) -> None:
@@ -37,6 +37,8 @@ class Interpreter:
             token = Token(INTEGER, int(current_char))
         elif current_char == '+':
             token = Token(PLUS, current_char)
+        elif current_char == '-':
+            token = Token(MINUS, current_char)
         
         self.pos += 1
         return token
@@ -57,12 +59,15 @@ class Interpreter:
         self.eat(INTEGER)
 
         operator = self.current_token
-        self.eat(PLUS)
+        if operator.value_type == PLUS:
+            self.eat(PLUS)
+        elif operator.value_type == MINUS:
+            self.eat(MINUS)
 
         right = self.current_token
         self.eat(INTEGER)
 
-        result = left.value + right.value
+        result = eval('{lval} {op} {rval}'.format(lval=left.value, op=operator.value, rval=right.value))
         return result
 
 def main():
