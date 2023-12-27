@@ -1,6 +1,3 @@
-# Interpreter
-
-# Identify
 INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 class Token:
@@ -33,6 +30,10 @@ class Interpreter:
             return Token(EOF, None)
         
         current_char = text[self.pos]
+        while current_char.isspace():
+            self.pos += 1
+            current_char = text[self.pos]
+
         if current_char.isdigit():
             digit_str = ''
             while current_char.isdigit():
