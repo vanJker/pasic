@@ -1,4 +1,4 @@
-INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
+INTEGER, PLUS, MINUS, MUL, DIV, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MUL', 'DIV', 'EOF'
 
 class Token:
     def __init__(self, value_type, value):
@@ -62,6 +62,12 @@ class Interpreter:
             if self.current_char == '-':
                 self.advance()
                 return Token(MINUS, '-')
+            if self.current_char == '*':
+                self.advance()
+                return Token(MUL, '*')
+            if self.current_char == '/':
+                self.advance()
+                return Token(DIV, '/')
             self.error()
         return Token(EOF, None)
 
