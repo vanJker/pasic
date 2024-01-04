@@ -1,7 +1,7 @@
 INTEGER, PLUS, MINUS, EOF = 'INTEGER', 'PLUS', 'MINUS', 'EOF'
 
 class Token:
-    def __init__(self, value_type, value) -> None:
+    def __init__(self, value_type, value):
         self.value_type = value_type    # value type of token
         self.value = value              # value of token
     
@@ -12,46 +12,58 @@ class Token:
         return self.__str__()
 
 class Interpreter:
-    def __init__(self, text: str) -> None:
-        self.text = text                    # expression of input
-        self.pos  = 0                       # current position of char in text
-        self.current_token: Token = None    # current token
+    def __init__(self, text: str):
+        self.text = text                                # expression of input
+        self.pos  = 0                                   # current position of char in text
+        self.current_token: Token = None                # current token
+        self.current_char: str = self.text[self.pos]    # current char
     
     def error(self):
         '''Throw error if get error input.
         '''
         raise Exception('Warning: error input!')
+    
+    def advance(self):
+        '''Get next character from text.
+        '''
+        self.pos += 1
+        if self.pos >= len(self.text):
+            self.current_char = None
+        else:
+            self.current_char = self.text[self.pos]
+    
+    def skip_whitespace(self):
+        '''Skip whitspaces in text.
+        '''
+        while self.current_char is not None and self.current_char.isspace():
+            self.advance()
+    
+    def long_integer(self):
+        '''Get multi-digit integer from text.
+        '''
+        result = ''
+        while self.current_char is not None and self.current_char.isdigit():
+            result += self.current_char
+            self.advance()
+        return int(result)
 
     def get_next_token(self) -> Token:
         '''Get next token from text.
         '''
-        text = self.text
-        if self.pos >= len(text):
-            return Token(EOF, None)
-        
-        current_char = text[self.pos]
-        while current_char.isspace():
-            self.pos += 1
-            current_char = text[self.pos]
-
-        if current_char.isdigit():
-            digit_str = ''
-            while current_char.isdigit():
-                digit_str += current_char
-                self.pos += 1
-                try:
-                    current_char = text[self.pos]
-                except:
-                    break            
-            self.pos -= 1
-            token = Token(INTEGER, int(digit_str))
-        elif current_char == '+':
-            token = Token(PLUS, current_char)
-        elif current_char == '-':
-            token = Token(MINUS, current_char)
-        
-        self.pos += 1
-        return token
+        while self.current_char is not None:
+            if self.current_char.isspace():
+                self.skip_whitespace()
+                continue
+            if self.current_char.isdigit():
+                return Token(INTEGER, self.long_integer())
+            if self.current_char == '+':
+                self.advance()
+                return Token(PLUS, '+')
+            if self.current_char == '-':
+                self.advance()
+                return Token(MINUS, '-')
+            self.error()
+        return Token(EOF, None)
 
     def eat(self, token_type) -> None:
         '''match current token with given token type, and get next token.
