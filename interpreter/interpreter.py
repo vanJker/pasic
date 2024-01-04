@@ -11,11 +11,10 @@ class Token:
     def __repr__(self) -> str:
         return self.__str__()
 
-class Interpreter:
+class Lexer:
     def __init__(self, text: str):
         self.text = text                                # expression of input
         self.pos  = 0                                   # current position of char in text
-        self.current_token: Token = None                # current token
         self.current_char: str = self.text[self.pos]    # current char
     
     def error(self):
@@ -71,11 +70,16 @@ class Interpreter:
             self.error()
         return Token(EOF, None)
 
+class Interpreter:
+    def __init__(self, lexer: Lexer):
+        self.lexer = lexer
+        self.current_token = self.lexer.get_next_token()
+
     def eat(self, token_type) -> None:
         '''match current token with given token type, and get next token.
         '''
         if self.current_token.value_type == token_type:
-            self.current_token = self.get_next_token()
+            self.current_token = self.lexer.get_next_token()
         else:
             self.error()
         
@@ -89,10 +93,9 @@ class Interpreter:
     def expr(self):
         '''Evaluate the expression.
         '''
-        self.current_token = self.get_next_token()
         result = self.term()
 
-        while not self.current_token.value_type == EOF:
+        while self.current_token.value_type in (PLUS, MINUS, MUL, DIV):
             operator = self.current_token
             self.eat(operator.value_type)
             right = self.term()
@@ -109,7 +112,8 @@ def main():
         if not text:
             continue
 
-        interpreter = Interpreter(text)
+        lexer = Lexer(text)
+        interpreter = Interpreter(lexer)
         result = interpreter.expr()
         print('{text} = {result}'.format(text=text, result=result))
 
