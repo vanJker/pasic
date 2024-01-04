@@ -80,16 +80,18 @@ class Interpreter:
         left = self.current_token
         self.eat(INTEGER)
 
-        operator = self.current_token
-        if operator.value_type == PLUS:
-            self.eat(PLUS)
-        elif operator.value_type == MINUS:
-            self.eat(MINUS)
+        result = left.value
+        while not self.current_token.value_type == EOF:
+            operator = self.current_token
+            if operator.value_type == PLUS:
+                self.eat(PLUS)
+            elif operator.value_type == MINUS:
+                self.eat(MINUS)
 
-        right = self.current_token
-        self.eat(INTEGER)
+            right = self.current_token
+            self.eat(INTEGER)
 
-        result = eval('{lval} {op} {rval}'.format(lval=left.value, op=operator.value, rval=right.value))
+            result = eval('{lval} {op} {rval}'.format(lval=result, op=operator.value, rval=right.value))
         return result
 
 def main():
