@@ -74,6 +74,11 @@ class Interpreter:
     def __init__(self, lexer: Lexer):
         self.lexer = lexer
         self.current_token = self.lexer.get_next_token()
+    
+    def error(self):
+        '''Throw error if eat an unmatched token.
+        '''
+        raise Exception('Warning: unmatched token!')
 
     def eat(self, token_type) -> None:
         '''match current token with given token type, and get next token.
