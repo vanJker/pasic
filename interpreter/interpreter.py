@@ -72,26 +72,26 @@ class Interpreter:
             self.current_token = self.get_next_token()
         else:
             self.error()
+        
+    def term(self):
+        '''Evaluate the term.
+        '''
+        term_value = self.current_token.value
+        self.eat(INTEGER)
+        return term_value
 
     def expr(self):
-        '''Evaluate expression.
+        '''Evaluate the expression.
         '''
         self.current_token = self.get_next_token()
-        left = self.current_token
-        self.eat(INTEGER)
+        result = self.term()
 
-        result = left.value
         while not self.current_token.value_type == EOF:
             operator = self.current_token
-            if operator.value_type == PLUS:
-                self.eat(PLUS)
-            elif operator.value_type == MINUS:
-                self.eat(MINUS)
-
-            right = self.current_token
-            self.eat(INTEGER)
-
-            result = eval('{lval} {op} {rval}'.format(lval=result, op=operator.value, rval=right.value))
+            self.eat(operator.value_type)
+            right = self.term()
+            result = eval('{lval} {op} {rval}'.format(lval=result, op=operator.value, rval=right))
+        
         return result
 
 def main():
